@@ -5,6 +5,7 @@ import { useTypingTest } from "@/hooks/useTypingTest";
 import WordDisplay from "./WordDisplay";
 import TimerSelector from "./TimerSelector";
 import Results from "./Results";
+import ProgressBar from "./ProgressBar";
 
 export default function TypingTest() {
   const [duration, setDuration] = useState(30);
@@ -22,6 +23,7 @@ export default function TypingTest() {
       ref={containerRef}
       tabIndex={0}
       onKeyDown={handleKeyDown}
+      onClick={() => containerRef.current?.focus()}
       className="outline-none max-w-3xl mx-auto"
     >
       {status === "finished" ? (
@@ -38,6 +40,7 @@ export default function TypingTest() {
               {timeLeft}
             </div>
           </div>
+          <ProgressBar progress={currentWordIndex / words.length} />
           <WordDisplay
             words={words}
             currentWordIndex={currentWordIndex}

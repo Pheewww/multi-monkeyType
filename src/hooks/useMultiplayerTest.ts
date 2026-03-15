@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useWebSocket } from "./useWebSocket";
 import { useTypingTest } from "./useTypingTest";
@@ -92,6 +93,17 @@ export function useMultiplayerTest(roomId: string, playerName: string) {
     }
   }, [typing.status, roomStatus, send, typing]);
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Tab" && roomStatus === "running") {
+        e.preventDefault();
+        return;
+      }
+      typing.handleKeyDown(e);
+    },
+    [roomStatus, typing]
+  );
+
   const startGame = useCallback(() => {
     send({ type: "start_game" });
   }, [send]);
@@ -111,6 +123,7 @@ export function useMultiplayerTest(roomId: string, playerName: string) {
     opponentResults,
     error,
     startGame,
+    handleKeyDown,
     typing,
     seed,
   };

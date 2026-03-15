@@ -87,6 +87,15 @@ wss.on("connection", (ws, req) => {
     try { msg = JSON.parse(raw.toString()); } catch { return; }
 
     if (msg.type === "join") {
+      // Allow rejoin by same name (handles page reload)
+      const existingPlayer = Array.from(room.players.values()).find(
+        (p) => p.name === (msg.name || "Player")
+      );
+      if (existingPlayer) {
+        existingPlayer.ws.close();
+        room.players.delete(existingPlayer.id);
+      }
+
       if (room.players.size >= 2) {
         send(ws, { type: "error", message: "Room is full" });
         ws.close();

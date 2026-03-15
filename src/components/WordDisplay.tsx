@@ -50,8 +50,9 @@ export default function WordDisplay({ words, currentWordIndex, isFinished, oppon
                 color = typed[ci] === char ? "text-[var(--color-correct)]" : "text-[var(--color-error)]";
               }
               const showCursor = isActive && ci === typed.length;
+              const showOpponentCursor = isOpponentWord && ci === 0 && !showCursor;
               return (
-                <span key={ci} className={`${color} ${showCursor ? "border-l-2 border-[var(--color-accent)] cursor-blink" : ""}`}>
+                <span key={ci} className={`${color} ${showCursor ? "border-l-2 border-[var(--color-accent)] cursor-blink" : ""} ${showOpponentCursor ? "border-l-2 border-[var(--color-error)]" : ""}`}>
                   {char}
                 </span>
               );

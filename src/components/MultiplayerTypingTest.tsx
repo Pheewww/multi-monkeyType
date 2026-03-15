@@ -6,6 +6,7 @@ import WordDisplay from "./WordDisplay";
 import Results from "./Results";
 import Lobby from "./Lobby";
 import Countdown from "./Countdown";
+import ProgressBar from "./ProgressBar";
 
 interface Props {
   roomId: string;
@@ -23,6 +24,7 @@ export default function MultiplayerTypingTest({ roomId, playerName }: Props) {
     opponentResults,
     error,
     startGame,
+    handleKeyDown,
     typing,
   } = useMultiplayerTest(roomId, playerName);
 
@@ -87,7 +89,8 @@ export default function MultiplayerTypingTest({ roomId, playerName }: Props) {
     <div
       ref={containerRef}
       tabIndex={0}
-      onKeyDown={typing.handleKeyDown}
+      onKeyDown={handleKeyDown}
+      onClick={() => containerRef.current?.focus()}
       className="outline-none max-w-3xl mx-auto w-full"
     >
       <div className="flex items-center justify-between mb-4">
@@ -102,6 +105,10 @@ export default function MultiplayerTypingTest({ roomId, playerName }: Props) {
           {typing.timeLeft}
         </div>
       </div>
+      <ProgressBar
+        progress={typing.currentWordIndex / typing.words.length}
+        opponentProgress={opponentProgress.currentWordIndex / typing.words.length}
+      />
       <WordDisplay
         words={typing.words}
         currentWordIndex={typing.currentWordIndex}
