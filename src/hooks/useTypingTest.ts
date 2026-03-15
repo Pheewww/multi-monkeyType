@@ -22,10 +22,11 @@ export interface TestResults {
 
 const WORD_COUNT = 200;
 
-export function useTypingTest(duration: number) {
-  const [words, setWords] = useState<WordState[]>(() =>
-    generateWords(WORD_COUNT).map((w) => ({ word: w, typed: "" }))
-  );
+export function useTypingTest(duration: number, initialWords?: string[]) {
+  const [words, setWords] = useState<WordState[]>(() => {
+    const wordList = initialWords || generateWords(WORD_COUNT);
+    return wordList.map((w) => ({ word: w, typed: "" }));
+  });
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [status, setStatus] = useState<TestStatus>("idle");
   const [timeLeft, setTimeLeft] = useState(duration);
@@ -62,11 +63,17 @@ export function useTypingTest(duration: number) {
 
   const restart = useCallback(() => {
     stopTimer();
-    setWords(generateWords(WORD_COUNT).map((w) => ({ word: w, typed: "" })));
+    const wordList = initialWords || generateWords(WORD_COUNT);
+    setWords(wordList.map((w) => ({ word: w, typed: "" })));
     setCurrentWordIndex(0);
     setStatus("idle");
     setTimeLeft(duration);
-  }, [duration, stopTimer]);
+  }, [duration, stopTimer, initialWords]);
+
+  const forceStart = useCallback(() => {
+    setStatus("running");
+    startTimer();
+  }, [startTimer]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -170,5 +177,6 @@ export function useTypingTest(duration: number) {
     handleKeyDown,
     restart,
     getResults,
+    forceStart,
   };
 }

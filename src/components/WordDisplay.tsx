@@ -7,9 +7,10 @@ interface Props {
   words: WordState[];
   currentWordIndex: number;
   isFinished: boolean;
+  opponentWordIndex?: number;
 }
 
-export default function WordDisplay({ words, currentWordIndex, isFinished }: Props) {
+export default function WordDisplay({ words, currentWordIndex, isFinished, opponentWordIndex }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const activeWordRef = useRef<HTMLSpanElement>(null);
 
@@ -34,13 +35,14 @@ export default function WordDisplay({ words, currentWordIndex, isFinished }: Pro
       {words.map((wordState, wi) => {
         const isActive = wi === currentWordIndex && !isFinished;
         const isPast = wi < currentWordIndex;
+        const isOpponentWord = opponentWordIndex !== undefined && wi === opponentWordIndex;
         const { word, typed } = wordState;
 
         return (
           <span
             key={wi}
             ref={isActive ? activeWordRef : undefined}
-            className={`inline-block mr-3 ${isPast && typed !== word ? "border-b-2 border-[var(--color-error)]" : ""}`}
+            className={`inline-block mr-3 ${isPast && typed !== word ? "border-b-2 border-[var(--color-error)]" : ""} ${isOpponentWord ? "bg-[var(--color-text-dim)]/20 rounded" : ""}`}
           >
             {word.split("").map((char, ci) => {
               let color = "text-[var(--color-text-dim)]"; // untyped

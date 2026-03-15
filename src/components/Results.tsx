@@ -5,9 +5,10 @@ import { TestResults } from "@/hooks/useTypingTest";
 interface Props {
   results: TestResults;
   onRestart: () => void;
+  hideRestart?: boolean;
 }
 
-export default function Results({ results, onRestart }: Props) {
+export default function Results({ results, onRestart, hideRestart }: Props) {
   return (
     <div className="flex flex-col items-center gap-8">
       <div className="flex gap-12">
@@ -27,12 +28,14 @@ export default function Results({ results, onRestart }: Props) {
         <div>extra: <span className="text-[var(--color-error)]">{results.extra}</span></div>
         <div>missed: <span className="text-[var(--color-text)]">{results.missed}</span></div>
       </div>
-      <button
-        onClick={onRestart}
-        className="text-[var(--color-text-dim)] hover:text-[var(--color-text)] transition-colors text-sm"
-      >
-        tab - restart
-      </button>
+      {!hideRestart && (
+        <button
+          onClick={onRestart}
+          className="text-[var(--color-text-dim)] hover:text-[var(--color-text)] transition-colors text-sm"
+        >
+          tab - restart
+        </button>
+      )}
     </div>
   );
 }
