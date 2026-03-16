@@ -20,6 +20,11 @@ export interface TestResults {
   missed: number;
 }
 
+export interface WpmSnapshot {
+  time: number;
+  wpm: number;
+}
+
 const WORD_COUNT = 200;
 
 export function useTypingTest(duration: number, initialWords?: string[]) {
@@ -32,12 +37,18 @@ export function useTypingTest(duration: number, initialWords?: string[]) {
   const [timeLeft, setTimeLeft] = useState(duration);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number>(0);
+  const wpmHistoryRef = useRef<WpmSnapshot[]>([]);
+  const lastRecordedSecondRef = useRef<number>(0);
+  const wordsRef = useRef(words);
+  const wordIndexRef = useRef(currentWordIndex);
+  wordsRef.current = words;
+  wordIndexRef.current = currentWordIndex;
 
-  // Reset when duration changes
+  // Reset when duration or words change
   useEffect(() => {
     restart();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [duration]);
+  }, [duration, initialWords]);
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
@@ -48,9 +59,30 @@ export function useTypingTest(duration: number, initialWords?: string[]) {
 
   const startTimer = useCallback(() => {
     startTimeRef.current = Date.now();
+    wpmHistoryRef.current = [];
+    lastRecordedSecondRef.current = 0;
     timerRef.current = setInterval(() => {
       const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
       const remaining = Math.max(0, duration - elapsed);
+
+      // Record WPM snapshot each second
+      if (elapsed > 0 && elapsed > lastRecordedSecondRef.current) {
+        lastRecordedSecondRef.current = elapsed;
+        let correct = 0;
+        const w = wordsRef.current;
+        const idx = wordIndexRef.current;
+        for (let i = 0; i <= idx && i < w.length; i++) {
+          const { word, typed } = w[i];
+          if (i === idx && typed.length === 0) continue;
+          for (let j = 0; j < Math.max(word.length, typed.length); j++) {
+            if (j < word.length && j < typed.length && word[j] === typed[j]) correct++;
+          }
+          if (i < idx) correct++;
+        }
+        const wpm = Math.round(correct / 5 / (elapsed / 60));
+        wpmHistoryRef.current.push({ time: elapsed, wpm });
+      }
+
       if (remaining <= 0) {
         stopTimer();
         setTimeLeft(0);
@@ -68,6 +100,8 @@ export function useTypingTest(duration: number, initialWords?: string[]) {
     setCurrentWordIndex(0);
     setStatus("idle");
     setTimeLeft(duration);
+    wpmHistoryRef.current = [];
+    lastRecordedSecondRef.current = 0;
   }, [duration, stopTimer, initialWords]);
 
   const forceStart = useCallback(() => {
@@ -178,5 +212,6 @@ export function useTypingTest(duration: number, initialWords?: string[]) {
     restart,
     getResults,
     forceStart,
+    wpmHistory: wpmHistoryRef.current,
   };
 }

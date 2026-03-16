@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import MultiplayerTypingTest from "@/components/MultiplayerTypingTest";
+import ThemeSelector from "@/components/ThemeSelector";
 
 export default function RoomPage() {
   const params = useParams();
@@ -12,7 +13,10 @@ export default function RoomPage() {
 
   if (!joined) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center p-8">
+      <main className="min-h-screen flex flex-col items-center justify-center p-8 relative">
+        <div className="absolute top-4 right-4">
+          <ThemeSelector />
+        </div>
         <h1 className="text-[var(--color-text-dim)] text-sm mb-12 tracking-widest">monkeytype</h1>
         <div className="flex flex-col items-center gap-4">
           <h2 className="text-[var(--color-accent)] text-xl font-bold">enter your name</h2>
@@ -44,7 +48,10 @@ export default function RoomPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-8">
+    <main className="min-h-screen flex flex-col items-center justify-center p-8 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeSelector />
+      </div>
       <h1 className="text-[var(--color-text-dim)] text-sm mb-12 tracking-widest">monkeytype</h1>
       <MultiplayerTypingTest roomId={roomId} playerName={name.trim()} />
     </main>

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import TypingTest from "@/components/TypingTest";
+import ThemeSelector from "@/components/ThemeSelector";
 
 export default function Home() {
   const router = useRouter();
@@ -12,7 +13,10 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-8">
+    <main className="min-h-screen flex flex-col items-center justify-center p-8 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeSelector />
+      </div>
       <h1 className="text-[var(--color-text-dim)] text-sm mb-12 tracking-widest">
         monkeytype
       </h1>

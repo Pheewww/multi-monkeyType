@@ -20,6 +20,7 @@ interface Room {
   duration: number;
   status: "waiting" | "countdown" | "running" | "finished";
   countdownTimer?: NodeJS.Timeout;
+  rematchVotes: Set<string>;
 }
 
 const rooms = new Map<string, Room>();
@@ -56,6 +57,7 @@ function getRoom(roomId: string): Room {
       seed: Math.floor(Math.random() * 2147483647),
       duration: 30,
       status: "waiting",
+      rematchVotes: new Set(),
     };
     rooms.set(roomId, room);
   }
@@ -164,6 +166,33 @@ wss.on("connection", (ws, req) => {
         id: playerId,
         results: msg.results,
       }, playerId);
+    }
+
+    if (msg.type === "rematch") {
+      if (room.status !== "finished") return;
+      room.rematchVotes.add(playerId);
+      broadcast(room, { type: "rematch_requested", id: playerId }, playerId);
+
+      if (room.rematchVotes.size >= room.players.size && room.players.size >= 2) {
+        // Both players want rematch — reset and start countdown
+        room.rematchVotes.clear();
+        room.seed = Math.floor(Math.random() * 2147483647);
+        broadcast(room, { type: "rematch_start", seed: room.seed });
+
+        room.status = "countdown";
+        let count = 3;
+        broadcast(room, { type: "countdown", value: count });
+        room.countdownTimer = setInterval(() => {
+          count--;
+          if (count <= 0) {
+            clearInterval(room.countdownTimer!);
+            room.status = "running";
+            broadcast(room, { type: "countdown", value: 0 });
+          } else {
+            broadcast(room, { type: "countdown", value: count });
+          }
+        }, 1000);
+      }
     }
   });
 

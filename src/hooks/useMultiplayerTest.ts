@@ -17,6 +17,8 @@ export function useMultiplayerTest(roomId: string, playerName: string) {
   const [opponentProgress, setOpponentProgress] = useState({ currentWordIndex: 0, wpm: 0 });
   const [opponentResults, setOpponentResults] = useState<TestResults | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [myRematchRequested, setMyRematchRequested] = useState(false);
+  const [opponentRematchRequested, setOpponentRematchRequested] = useState(false);
   const joinedRef = useRef(false);
 
   const initialWords = useMemo(
@@ -67,6 +69,17 @@ export function useMultiplayerTest(roomId: string, playerName: string) {
         case "player_finished":
           setOpponentResults(msg.results);
           break;
+        case "rematch_requested":
+          setOpponentRematchRequested(true);
+          break;
+        case "rematch_start":
+          setSeed(msg.seed);
+          setOpponentProgress({ currentWordIndex: 0, wpm: 0 });
+          setOpponentResults(null);
+          setMyRematchRequested(false);
+          setOpponentRematchRequested(false);
+          setRoomStatus("countdown");
+          break;
         case "error":
           setError(msg.message);
           break;
@@ -108,6 +121,11 @@ export function useMultiplayerTest(roomId: string, playerName: string) {
     send({ type: "start_game" });
   }, [send]);
 
+  const requestRematch = useCallback(() => {
+    send({ type: "rematch" });
+    setMyRematchRequested(true);
+  }, [send]);
+
   const isOwner = players.find((p) => p.id === myId)?.isOwner ?? false;
   const opponent = players.find((p) => p.id !== myId) ?? null;
 
@@ -126,5 +144,8 @@ export function useMultiplayerTest(roomId: string, playerName: string) {
     handleKeyDown,
     typing,
     seed,
+    requestRematch,
+    myRematchRequested,
+    opponentRematchRequested,
   };
 }

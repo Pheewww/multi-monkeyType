@@ -26,6 +26,9 @@ export default function MultiplayerTypingTest({ roomId, playerName }: Props) {
     startGame,
     handleKeyDown,
     typing,
+    requestRematch,
+    myRematchRequested,
+    opponentRematchRequested,
   } = useMultiplayerTest(roomId, playerName);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -80,6 +83,21 @@ export default function MultiplayerTypingTest({ roomId, playerName }: Props) {
         ) : (
           <div className="text-[var(--color-text-dim)] text-sm">waiting for opponent to finish...</div>
         )}
+        <div className="flex flex-col items-center gap-2 mt-4">
+          {!myRematchRequested ? (
+            <button
+              onClick={requestRematch}
+              className="px-6 py-2 rounded font-bold bg-[var(--color-accent)] text-[var(--color-bg)] hover:opacity-90 transition-opacity"
+            >
+              rematch
+            </button>
+          ) : (
+            <div className="text-[var(--color-text-dim)] text-sm">waiting for opponent...</div>
+          )}
+          {opponentRematchRequested && !myRematchRequested && (
+            <div className="text-[var(--color-accent)] text-sm font-bold">opponent wants a rematch!</div>
+          )}
+        </div>
       </div>
     );
   }

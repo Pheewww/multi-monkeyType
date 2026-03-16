@@ -21,7 +21,8 @@ export type ClientMessage =
   | { type: "join"; name: string }
   | { type: "start_game" }
   | { type: "progress"; currentWordIndex: number; wpm: number }
-  | { type: "finished"; results: TestResults };
+  | { type: "finished"; results: TestResults }
+  | { type: "rematch" };
 
 // Server -> Client
 export type ServerMessage =
@@ -31,4 +32,6 @@ export type ServerMessage =
   | { type: "countdown"; value: number }
   | { type: "progress"; id: string; currentWordIndex: number; wpm: number }
   | { type: "player_finished"; id: string; results: TestResults }
+  | { type: "rematch_requested"; id: string }
+  | { type: "rematch_start"; seed: number }
   | { type: "error"; message: string };

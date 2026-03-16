@@ -9,7 +9,7 @@ import ProgressBar from "./ProgressBar";
 
 export default function TypingTest() {
   const [duration, setDuration] = useState(30);
-  const { words, currentWordIndex, status, timeLeft, handleKeyDown, restart, getResults } =
+  const { words, currentWordIndex, status, timeLeft, handleKeyDown, restart, getResults, wpmHistory } =
     useTypingTest(duration);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -27,7 +27,7 @@ export default function TypingTest() {
       className="outline-none max-w-3xl mx-auto"
     >
       {status === "finished" ? (
-        <Results results={getResults()} onRestart={restart} />
+        <Results results={getResults()} onRestart={restart} wpmHistory={wpmHistory} />
       ) : (
         <>
           <div className="flex items-center justify-between mb-4">
